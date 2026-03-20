@@ -3,6 +3,7 @@ GitHub Octocat スプレー塗装用ガード（ステンシル）生成
 - 正方形の板にOctocatシルエットをくり抜いた貫通型モデル
 - 紙袋等に置いてスプレーすると、くり抜き部分だけ塗料が通りロゴが転写される
 - 正方形の縁を広めにとり、スプレーが外に漏れないようにする
+- 通常版（白くり抜き）と反転版（黒くり抜き）の2種類を生成
 """
 
 import numpy as np
@@ -35,30 +36,33 @@ black_mask = pixels < 128
 smoothed = ndimage.gaussian_filter(black_mask.astype(float), sigma=1.5)
 black_mask = smoothed > 0.5
 
-# 白部分（Octocatシルエット）= くり抜く部分
-# 円の範囲内の白部分だけ取得（外側の余白は除外）
+# 円の範囲内だけ取得（外側の余白は除外）
 y, x = np.ogrid[:RESOLUTION, :RESOLUTION]
 center = RESOLUTION / 2
 radius_px = RESOLUTION * 0.48
 circle_mask = ((x - center) ** 2 + (y - center) ** 2) <= radius_px ** 2
-octocat_mask = (~black_mask) & circle_mask  # Octocatシルエット部分
+
+# 通常版: 白部分（Octocatシルエット）= くり抜く部分
+octocat_mask = (~black_mask) & circle_mask
+
+# 反転版: 黒部分（Octocat周囲の背景）= くり抜く部分
+inverse_mask = black_mask & circle_mask
 
 # --- 正方形ガード用の拡大グリッド作成 ---
-# ガードのマージンをピクセル数に変換
 margin_px = int(GUARD_MARGIN / LOGO_AREA_SIZE * RESOLUTION)
 total_px = RESOLUTION + margin_px * 2
-
-# 正方形全体のマスク（全面がソリッド）
-guard_mask = np.ones((total_px, total_px), dtype=bool)
-
-# Octocatシルエット部分をくり抜く（中央にオフセットして配置）
-for i in range(RESOLUTION):
-    for j in range(RESOLUTION):
-        if octocat_mask[i, j]:
-            guard_mask[i + margin_px, j + margin_px] = False
-
-# スケール計算
 scale = TOTAL_SIZE / total_px
+
+
+def build_guard_mask(cutout_mask):
+    """くり抜きマスクから正方形ガード全体のマスクを生成する。"""
+    guard = np.ones((total_px, total_px), dtype=bool)
+    guard[margin_px:margin_px + RESOLUTION, margin_px:margin_px + RESOLUTION][cutout_mask] = False
+    return guard
+
+
+guard_mask_normal = build_guard_mask(octocat_mask)
+guard_mask_inverse = build_guard_mask(inverse_mask)
 
 print(f"=== スプレーガード（ステンシル）生成 ===")
 print(f"  全体サイズ: {TOTAL_SIZE:.0f}mm × {TOTAL_SIZE:.0f}mm (正方形)")
@@ -122,30 +126,41 @@ def mask_to_watertight_stl(mask, scale, height, filename):
     return filename
 
 
-# === STL生成 ===
-print("STL生成中...")
-stl_path = os.path.join(OUTPUT_DIR, "octocat_spray_guard.stl")
-mask_to_watertight_stl(guard_mask, scale, EXTRUDE_HEIGHT, stl_path)
+def generate_all_formats(guard_mask, base_name, label):
+    """STL/OBJ/3MFの3形式をまとめて生成する。"""
+    print(f"--- {label} ---")
+    print("STL生成中...")
+    stl_path = os.path.join(OUTPUT_DIR, f"{base_name}.stl")
+    mask_to_watertight_stl(guard_mask, scale, EXTRUDE_HEIGHT, stl_path)
 
-# === STLからOBJ等に変換 ===
-print("\nフォーマット変換中...")
-tmesh = trimesh.load(stl_path)
+    print("フォーマット変換中...")
+    tmesh = trimesh.load(stl_path)
 
-obj_path = os.path.join(OUTPUT_DIR, "octocat_spray_guard.obj")
-tmesh.export(obj_path, file_type="obj")
-print(f"  OBJ: {obj_path} ({os.path.getsize(obj_path)/1024:.0f} KB)")
+    obj_path = os.path.join(OUTPUT_DIR, f"{base_name}.obj")
+    tmesh.export(obj_path, file_type="obj")
+    print(f"  OBJ: {obj_path} ({os.path.getsize(obj_path)/1024:.0f} KB)")
 
-threemf_path = os.path.join(OUTPUT_DIR, "octocat_spray_guard.3mf")
-tmesh.export(threemf_path, file_type="3mf")
-print(f"  3MF: {threemf_path} ({os.path.getsize(threemf_path)/1024:.0f} KB)")
+    threemf_path = os.path.join(OUTPUT_DIR, f"{base_name}.3mf")
+    tmesh.export(threemf_path, file_type="3mf")
+    print(f"  3MF: {threemf_path} ({os.path.getsize(threemf_path)/1024:.0f} KB)")
+    print()
 
-print(f"\n✅ 完了！")
+
+# === 通常版: 白くり抜き（Octocatシルエットが穴） ===
+generate_all_formats(guard_mask_normal, "octocat_spray_guard",
+                     "通常版（白くり抜き：Octocatシルエットが穴）")
+
+# === 反転版: 黒くり抜き（Octocat周囲が穴） ===
+generate_all_formats(guard_mask_inverse, "octocat_spray_guard_inverse",
+                     "反転版（黒くり抜き：Octocat周囲が穴）")
+
+print(f"✅ 両バージョン生成完了！")
 print(f"\n=== モデル仕様 ===")
-print(f"  形状: 正方形ステンシル（Octocatくり抜き）")
-print(f"  サイズ: {TOTAL_SIZE:.0f}mm × {TOTAL_SIZE:.0f}mm × {EXTRUDE_HEIGHT:.1f}mm")
+print(f"  形状: 正方形ステンシル（100mm × 100mm × {EXTRUDE_HEIGHT:.1f}mm）")
 print(f"  ガード幅: 各辺 {GUARD_MARGIN:.0f}mm")
-print(f"\n=== 使い方 ===")
-print(f"  1. 3Dプリントする（PLA推奨、インフィル100%）")
-print(f"  2. 紙袋の上にこのステンシルを置く")
-print(f"  3. くり抜き部分からスプレー塗装する")
-print(f"  4. ステンシルを外すとOctocatロゴが紙袋に転写される")
+print(f"\n=== 通常版 (octocat_spray_guard) ===")
+print(f"  白い部分（Octocatシルエット）をくり抜き")
+print(f"  → スプレーするとOctocatの形が転写される")
+print(f"\n=== 反転版 (octocat_spray_guard_inverse) ===")
+print(f"  黒い部分（Octocat周囲の背景）をくり抜き")
+print(f"  → スプレーするとOctocatの周りが塗られ、Octocatが白抜きになる")
