@@ -83,6 +83,12 @@ python generate_spray_guard.py
 - The GitHub logo and Octocat are **trademarks of GitHub, Inc.** This project is not affiliated with, endorsed by, or sponsored by GitHub.
 - Please refer to the [GitHub Logo Usage Guidelines](https://github.com/logos) before using or distributing any output.
 
+## Demo Video
+
+[![Demo Video](https://img.youtube.com/vi/PxDf4HDmUJs/0.jpg)](https://youtu.be/PxDf4HDmUJs)
+
+▶️ [Watch the demo on YouTube](https://youtu.be/PxDf4HDmUJs)
+
 ## Related
 
 - [copilot-cli-cad-experiment](https://github.com/ktanino10/copilot-cli-cad-experiment) — Original CAD generation experiment
@@ -169,6 +175,12 @@ python generate_spray_guard.py
 - 本プロジェクトは**個人的・教育目的のみ**で作成されています。**商用利用は一切意図していません。**
 - GitHubロゴおよびOctocatは **GitHub, Inc. の商標** です。本プロジェクトはGitHubとの提携・推奨・後援を受けたものではありません。
 - 出力物の使用・配布にあたっては、[GitHubロゴ使用ガイドライン](https://github.com/logos)をご確認ください。
+
+## デモ動画
+
+[![デモ動画](https://img.youtube.com/vi/PxDf4HDmUJs/0.jpg)](https://youtu.be/PxDf4HDmUJs)
+
+▶️ [YouTubeでデモを見る](https://youtu.be/PxDf4HDmUJs)
 
 ## 関連プロジェクト
 
