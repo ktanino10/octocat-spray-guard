@@ -83,11 +83,11 @@ python generate_spray_guard.py
 - The GitHub logo and Octocat are **trademarks of GitHub, Inc.** This project is not affiliated with, endorsed by, or sponsored by GitHub.
 - Please refer to the [GitHub Logo Usage Guidelines](https://github.com/logos) before using or distributing any output.
 
-## Demo Video
+## Making-of Video
 
-[![Demo Video](https://img.youtube.com/vi/PxDf4HDmUJs/0.jpg)](https://youtu.be/PxDf4HDmUJs)
+[![Making-of Video](https://img.youtube.com/vi/PxDf4HDmUJs/0.jpg)](https://youtu.be/PxDf4HDmUJs)
 
-▶️ [Watch the demo on YouTube](https://youtu.be/PxDf4HDmUJs)
+▶️ [Watch the making-of on YouTube](https://youtu.be/PxDf4HDmUJs)
 
 ## Related
 
@@ -176,11 +176,11 @@ python generate_spray_guard.py
 - GitHubロゴおよびOctocatは **GitHub, Inc. の商標** です。本プロジェクトはGitHubとの提携・推奨・後援を受けたものではありません。
 - 出力物の使用・配布にあたっては、[GitHubロゴ使用ガイドライン](https://github.com/logos)をご確認ください。
 
-## デモ動画
+## 制作記録
 
-[![デモ動画](https://img.youtube.com/vi/PxDf4HDmUJs/0.jpg)](https://youtu.be/PxDf4HDmUJs)
+[![制作記録](https://img.youtube.com/vi/PxDf4HDmUJs/0.jpg)](https://youtu.be/PxDf4HDmUJs)
 
-▶️ [YouTubeでデモを見る](https://youtu.be/PxDf4HDmUJs)
+▶️ [YouTubeで制作記録を見る](https://youtu.be/PxDf4HDmUJs)
 
 ## 関連プロジェクト
 
